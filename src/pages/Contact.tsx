@@ -2,14 +2,17 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import PageWrapper from "../components/PageWrapper";
 import { User, Mail, MessageSquare, Phone, MapPin, Send } from "lucide-react";
+import api from "../utils/api";
+import { useSettings } from "../context/SettingsContext";
 
 export default function Contact() {
+  const { settings } = useSettings();
   const formik = useFormik({
-    initialValues: { 
-      name: "", 
-      email: "", 
+    initialValues: {
+      name: "",
+      email: "",
       subject: "",
-      message: "" 
+      message: ""
     },
     validationSchema: Yup.object({
       name: Yup.string().required("İsim zorunludur"),
@@ -17,8 +20,18 @@ export default function Contact() {
       subject: Yup.string().required("Konu zorunludur"),
       message: Yup.string().required("Mesaj zorunludur"),
     }),
-    onSubmit: (values) => {
-      alert(`Mesajınız başarıyla gönderildi! \n${JSON.stringify(values, null, 2)}`);
+    onSubmit: async (values, { resetForm }) => {
+      try {
+        const response = await api.post('/messages', values);
+        const data = response.data as any;
+        if (data.status === 'success') {
+          alert('Mesajınız başarıyla gönderildi! En kısa sürede size dönüş yapacağız.');
+          resetForm();
+        }
+      } catch (error: any) {
+        console.error('Error sending message:', error);
+        alert(error.response?.data?.message || 'Mesaj gönderilirken bir hata oluştu.');
+      }
     },
   });
 
@@ -133,7 +146,7 @@ export default function Contact() {
             </form>
           </div>
 
-      
+
           <div className="space-y-8">
             <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8">
               <h2 className="text-2xl font-bold mb-6 text-gray-900">İletişim Bilgileri</h2>
@@ -144,7 +157,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">E-posta</h3>
-                    <p className="text-gray-600">info@edumini.com</p>
+                    <p className="text-gray-600">{settings['contact_email'] || 'info@edumini.com'}</p>
                     <p className="text-gray-600">destek@edumini.com</p>
                   </div>
                 </div>
@@ -155,7 +168,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">Telefon</h3>
-                    <p className="text-gray-600">+90 212 000 00 00</p>
+                    <p className="text-gray-600">{settings['contact_phone'] || '+90 212 000 00 00'}</p>
                     <p className="text-gray-600">+90 532 000 00 00</p>
                   </div>
                 </div>
@@ -166,7 +179,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">Adres</h3>
-                    <p className="text-gray-600">İstanbul, Şişli</p>
+                    <p className="text-gray-600">{settings['contact_address'] || 'İstanbul, Şişli'}</p>
                   </div>
                 </div>
               </div>

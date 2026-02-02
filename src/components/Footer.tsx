@@ -1,8 +1,11 @@
 import React from "react";
 import { BookOpen, Mail, Phone, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useSettings } from "../context/SettingsContext"; // Import useSettings
 
 const Footer: React.FC = () => {
+  const { settings } = useSettings();
+
   return (
     <footer className="bg-slate-800 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -69,15 +72,15 @@ const Footer: React.FC = () => {
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-blue-400" />
-                <span className="text-gray-300">info@edumini.com</span>
+                <span className="text-gray-300">{settings['contact_email'] || 'info@edumini.com'}</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-blue-400" />
-                <span className="text-gray-300">+90 212 000 00 00</span>
+                <span className="text-gray-300">{settings['contact_phone'] || '+90 212 000 00 00'}</span>
               </div>
               <div className="flex items-center space-x-3">
                 <MapPin className="h-5 w-5 text-blue-400" />
-                <span className="text-gray-300">İstanbul, Türkiye</span>
+                <span className="text-gray-300">{settings['contact_address'] || 'İstanbul, Türkiye'}</span>
               </div>
             </div>
           </div>

@@ -1,21 +1,36 @@
-import { Star, Clock, Tag } from "lucide-react";
+import { Star, Clock, Tag, ArrowRight } from "lucide-react";
 import { courses } from "../data/courses";
 import PageWrapper from "../components/PageWrapper";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+
+import AnnouncementBanner from "../components/AnnouncementBanner";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
 
-  const handleRegisterClick = () => {
-    navigate("/register");
+  const handleBuyClick = (courseId: string, courseTitle: string) => {
+    if (!user) {
+      navigate("/login", {
+        state: {
+          from: { pathname: `/payment/${courseId}` },
+          courseTitle: courseTitle
+        }
+      });
+      return;
+    }
+    navigate(`/payment/${courseId}`);
   };
 
-  const handleCourseClick = () => {
-    navigate("/courses");
+  const handleCourseClick = (id: string) => {
+    navigate(`/courses/${id}`);
   };
 
   return (
     <PageWrapper>
+      <AnnouncementBanner />
       <div className="px-2 sm:px-4 md:px-8 lg:px-12 w-full">
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold mb-6 text-gray-900">
@@ -32,7 +47,7 @@ export default function Home() {
             <div
               key={course.id}
               className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
-              onClick={handleCourseClick}
+              onClick={() => handleCourseClick(course.id)}
             >
               <div className="relative">
                 <img
@@ -73,19 +88,29 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <button 
+                  <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleRegisterClick();
+                      handleBuyClick(course.id, course.title);
                     }}
                     className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
                   >
-                    Kayıt Ol
+                    Satın Al
                   </button>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="flex justify-end mt-8">
+          <button
+            onClick={() => navigate('/courses')}
+            className="flex items-center space-x-2 text-blue-600 hover:text-blue-800 font-semibold transition-colors group"
+          >
+            <span>Tüm Kurslar</span>
+            <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
+          </button>
         </div>
       </div>
     </PageWrapper>
